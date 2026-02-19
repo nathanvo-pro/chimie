@@ -125,7 +125,7 @@ def predict():
         concentration = calibrate(intensity)
 
         return jsonify({
-            "concentration": concentration,
+            "concentration": float(f"{concentration:.4g}"),
             "unit": "µg/mL",
             "intensity": round(intensity, 2),
         })
