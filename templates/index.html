@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFAquant — Détection d'Anticorps Bovins</title>
+    <meta name="description"
+        content="Application d'analyse de test à flux latéral pour la détection d'anticorps bovins dans le lait de brebis.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Prism.js syntax highlighting (One Dark theme) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <!-- Cropper.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
+</head>
+
+<body>
+
+    <!-- ════════════════ HERO ════════════════ -->
+    <header class="hero">
+        <div class="hero__badge">🔬 Projet Chimie</div>
+        <h1 class="hero__title">Détection d'Anticorps Bovins<br><span>dans le Lait de Brebis</span></h1>
+        <p class="hero__subtitle">Quantification par test à flux latéral &amp; analyse d'image</p>
+        <div class="hero__scroll-hint">
+            <span>Découvrir le protocole</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M7 13l5 5 5-5M7 6l5 5 5-5" />
+            </svg>
+        </div>
+    </header>
+
+    <!-- ════════════════ PROTOCOLE ════════════════ -->
+    <section class="protocol" id="protocol">
+        <h2 class="section-title">Protocole</h2>
+        <p class="section-desc">Suivez ces étapes pour réaliser le test puis analysez le résultat.</p>
+
+        <div class="steps">
+            <!-- Étape 1 -->
+            <div class="step-card" style="--delay: 0.1s">
+                <div class="step-card__number">1</div>
+                <div class="step-card__icon">🧪</div>
+                <h3>Préparation de l'échantillon</h3>
+                <p>Diluez l'échantillon de lait de brebis selon le ratio indiqué dans le protocole. Homogénéisez bien
+                    avant de poursuivre.</p>
+            </div>
+
+            <!-- Étape 2 -->
+            <div class="step-card" style="--delay: 0.2s">
+                <div class="step-card__number">2</div>
+                <div class="step-card__icon">💧</div>
+                <h3>Dépôt sur la bandelette</h3>
+                <p>Déposez le volume requis d'échantillon dilué sur la zone de dépôt de la bandelette à flux latéral.
+                    Laissez migrer.</p>
+            </div>
+
+            <!-- Étape 3 -->
+            <div class="step-card" style="--delay: 0.3s">
+                <div class="step-card__number">3</div>
+                <div class="step-card__icon">⏱️</div>
+                <h3>Temps d'incubation</h3>
+                <p>Attendez le temps d'incubation recommandé (environ 10‑15 min) pour permettre la réaction
+                    antigène‑anticorps.</p>
+            </div>
+
+            <!-- Étape 4 -->
+            <div class="step-card" style="--delay: 0.4s">
+                <div class="step-card__number">4</div>
+                <div class="step-card__icon">📸</div>
+                <h3>Capture &amp; analyse</h3>
+                <p>Photographiez la bandelette dans de bonnes conditions lumineuses puis utilisez le bouton ci‑dessous
+                    pour lancer l'analyse.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ════════════════ ANALYSE ════════════════ -->
+    <section class="analysis" id="analysis">
+        <h2 class="section-title">Analyse du test</h2>
+        <p class="section-desc">Prenez ou importez une photo de la bandelette pour quantifier les anticorps.</p>
+
+        <!-- Upload area -->
+        <div class="upload-zone" id="uploadZone">
+            <div class="upload-zone__content" id="uploadContent">
+                <svg class="upload-zone__icon" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                    <polyline points="17 8 12 3 7 8" />
+                    <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+                <p class="upload-zone__text">Glissez une image ici<br><span>ou cliquez pour parcourir</span></p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" capture="environment" hidden>
+        </div>
+
+        <!-- Cropper area (appears after upload) -->
+        <div class="cropper-wrapper" id="cropperWrapper" hidden>
+            <p class="cropper-hint">✂️ Sélectionnez la zone de la bande test avec le rectangle</p>
+            <div class="cropper-container-custom">
+                <img id="cropperImg" alt="Image à rogner">
+            </div>
+            <button class="btn btn--ghost" id="removeBtn" type="button">Changer d'image</button>
+        </div>
+
+        <!-- Bouton analyse -->
+        <button class="btn btn--primary btn--large" id="analyzeBtn" disabled>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            Analyser le test
+        </button>
+
+        <!-- Loading -->
+        <div class="loader" id="loader" hidden>
+            <div class="loader__spinner"></div>
+            <p class="loader__text">Analyse en cours…</p>
+        </div>
+
+        <!-- Résultat -->
+        <div class="result-card" id="resultCard" hidden>
+            <div class="result-card__header">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 11.08V12a10 10 0 11-5.93-9.14" />
+                    <polyline points="22 4 12 14.01 9 11.01" />
+                </svg>
+                Résultat de l'analyse
+            </div>
+            <div class="result-card__value">
+                <span id="resultValue">—</span>
+                <span class="result-card__unit" id="resultUnit">µg/mL</span>
+            </div>
+            <p class="result-card__detail" id="resultDetail"></p>
+            <button class="btn btn--ghost" id="resetBtn" type="button">Nouvelle analyse</button>
+        </div>
+
+        <!-- Erreur -->
+        <div class="error-card" id="errorCard" hidden>
+            <p id="errorText"></p>
+            <button class="btn btn--ghost" id="errorResetBtn" type="button">Réessayer</button>
+        </div>
+    </section>
+
+    <!-- ════════════════ CODE SOURCE ════════════════ -->
+    <section class="code-section" id="code">
+        <h2 class="section-title">Code Source — Analyse d'Image</h2>
+        <p class="section-desc">Script Python utilisé pour extraire l'intensité du canal vert et calculer la
+            concentration en anticorps.</p>
+
+        <div class="code-container">
+            <div class="code-header">
+                <span class="code-header__dot" style="background:#FF5F56"></span>
+                <span class="code-header__dot" style="background:#FFBD2E"></span>
+                <span class="code-header__dot" style="background:#27C93F"></span>
+                <span class="code-header__title">analyse_lfa.py</span>
+            </div>
+            <pre><code class="language-python">from PIL import Image
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.widgets import RectangleSelector
+import tkinter as tk
+from tkinter import filedialog
+import sys
+
+# ---------------------------------------------------
+# SÉLECTION DU FICHIER
+# ---------------------------------------------------
+
+root = tk.Tk()
+root.withdraw()
+
+print("📂 Ouverture de la fenêtre de sélection de fichier...")
+
+IMAGE_PATH = filedialog.askopenfilename(
+    title="Sélectionnez l'image du test",
+    filetypes=[("Images", "*.jpg *.jpeg *.png *.bmp *.tif")]
+)
+
+if not IMAGE_PATH:
+    print("❌ Aucun fichier sélectionné. Arrêt du programme.")
+    sys.exit()
+
+print(f"✅ Fichier chargé : {IMAGE_PATH}")
+
+# ---------------------------------------------------
+# PARAMÈTRES DE CALIBRATION
+# ---------------------------------------------------
+
+a = 8.12      # pente de la droite
+b = 152.33    # ordonnée à l'origine
+
+roi_coords = None
+
+# ---------------------------------------------------
+# FONCTIONS
+# ---------------------------------------------------
+
+def onselect(eclick, erelease):
+    """Callback quand l'utilisateur termine la sélection."""
+    global roi_coords
+    x1, y1 = int(eclick.xdata), int(eclick.ydata)
+    x2, y2 = int(erelease.xdata), int(erelease.ydata)
+    roi_coords = (min(x1, x2), min(y1, y2),
+                  max(x1, x2), max(y1, y2))
+    print("\n📌 Zone sélectionnée :", roi_coords)
+
+
+def compute_green_intensity(roi):
+    """Calcule l'intensité moyenne du VERT (canal G)."""
+    green = roi[:, :, 1].astype(np.float32)
+    return float(np.mean(green))
+
+
+def calibration(intensity, a, b):
+    """Applique la droite de calibration."""
+    return (intensity - b) / a
+
+# ---------------------------------------------------
+# PROGRAMME PRINCIPAL
+# ---------------------------------------------------
+
+if __name__ == "__main__":
+
+    img = Image.open(IMAGE_PATH).convert("RGB")
+    arr = np.array(img)
+
+    print("➡️  Sélectionnez la zone, puis fermez la fenêtre.")
+
+    fig, ax = plt.subplots(figsize=(8, 6))
+    ax.imshow(arr)
+    ax.set_title("Sélectionnez la zone puis fermez la fenêtre")
+
+    rect_selector = RectangleSelector(
+        ax, onselect, useblit=True,
+        button=[1], minspanx=5, minspany=5,
+        spancoords='pixels', interactive=True
+    )
+    plt.show()
+
+    if roi_coords is None:
+        print("❌ Aucune zone sélectionnée.")
+        sys.exit()
+
+    x1, y1, x2, y2 = roi_coords
+    h, w = arr.shape[:2]
+    x1, x2 = max(0, min(w-1, x1)), max(0, min(w-1, x2))
+    y1, y2 = max(0, min(h-1, y1)), max(0, min(h-1, y2))
+    roi = arr[y1:y2, x1:x2]
+
+    green_intensity = compute_green_intensity(roi)
+    concentration = calibration(green_intensity, a, b)
+
+    print("\n🟩 Intensité moyenne du vert =", green_intensity)
+    print("📘 Concentration déduite =", concentration)</code></pre>
+        </div>
+    </section>
+
+    <!-- ════════════════ FOOTER ════════════════ -->
+    <footer class="footer">
+        <p>Projet de Chimie — Détection d'anticorps bovins &bull; <span id="year"></span></p>
+    </footer>
+
+    <!-- ════════════════ JAVASCRIPT ════════════════ -->
+    <!-- Cropper.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+    <script>
+        (() => {
+            // DOM refs
+            const fileInput = document.getElementById("fileInput");
+            const uploadZone = document.getElementById("uploadZone");
+            const uploadContent = document.getElementById("uploadContent");
+            const cropperWrapper = document.getElementById("cropperWrapper");
+            const cropperImg = document.getElementById("cropperImg");
+            const removeBtn = document.getElementById("removeBtn");
+            const analyzeBtn = document.getElementById("analyzeBtn");
+            const loader = document.getElementById("loader");
+            const resultCard = document.getElementById("resultCard");
+            const resultValue = document.getElementById("resultValue");
+            const resultUnit = document.getElementById("resultUnit");
+            const resultDetail = document.getElementById("resultDetail");
+            const resetBtn = document.getElementById("resetBtn");
+            const errorCard = document.getElementById("errorCard");
+            const errorText = document.getElementById("errorText");
+            const errorResetBtn = document.getElementById("errorResetBtn");
+
+            let cropper = null;
+
+            // Année dynamique
+            document.getElementById("year").textContent = new Date().getFullYear();
+
+            // ── Intersection Observer (animation au scroll) ──
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); });
+            }, { threshold: 0.15 });
+            document.querySelectorAll(".step-card, .section-title, .section-desc").forEach(el => observer.observe(el));
+
+            // ── Upload zone click ──
+            uploadZone.addEventListener("click", () => fileInput.click());
+
+            // ── Drag & Drop ──
+            uploadZone.addEventListener("dragover", (e) => { e.preventDefault(); uploadZone.classList.add("dragover"); });
+            uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("dragover"));
+            uploadZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                uploadZone.classList.remove("dragover");
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+            });
+
+            // ── File selected ──
+            fileInput.addEventListener("change", () => {
+                if (fileInput.files.length) handleFile(fileInput.files[0]);
+            });
+
+            function handleFile(file) {
+                if (!file.type.startsWith("image/")) return;
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    // Afficher le cropper
+                    cropperImg.src = e.target.result;
+                    uploadZone.hidden = true;
+                    cropperWrapper.hidden = false;
+                    analyzeBtn.disabled = false;
+
+                    // Détruire l'ancien cropper s'il existe
+                    if (cropper) cropper.destroy();
+
+                    // Initialiser Cropper.js
+                    cropper = new Cropper(cropperImg, {
+                        viewMode: 1,
+                        dragMode: 'move',
+                        autoCropArea: 0.5,
+                        responsive: true,
+                        restore: false,
+                        guides: true,
+                        center: true,
+                        highlight: true,
+                        cropBoxMovable: true,
+                        cropBoxResizable: true,
+                        toggleDragModeOnDblclick: false,
+                    });
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // ── Remove / change image ──
+            removeBtn.addEventListener("click", resetUpload);
+
+            function resetUpload() {
+                if (cropper) { cropper.destroy(); cropper = null; }
+                fileInput.value = "";
+                cropperImg.src = "";
+                uploadZone.hidden = false;
+                cropperWrapper.hidden = true;
+                analyzeBtn.disabled = true;
+            }
+
+            // ── Analyze button ──
+            analyzeBtn.addEventListener("click", async () => {
+                if (!cropper) return;
+
+                // UI states
+                analyzeBtn.disabled = true;
+                loader.hidden = false;
+                resultCard.hidden = true;
+                errorCard.hidden = true;
+
+                // Récupérer la zone rognée comme Blob
+                const canvas = cropper.getCroppedCanvas();
+                canvas.toBlob(async (blob) => {
+                    const formData = new FormData();
+                    formData.append("image", blob, "cropped.png");
+
+                    try {
+                        const response = await fetch("/predict", { method: "POST", body: formData });
+                        const data = await response.json();
+
+                        loader.hidden = true;
+
+                        if (!response.ok) {
+                            showError(data.error || "Erreur inconnue.");
+                            return;
+                        }
+
+                        // Afficher le résultat
+                        resultValue.textContent = data.concentration;
+                        resultUnit.textContent = data.unit;
+                        resultDetail.textContent = `Intensité verte mesurée : ${data.intensity}`;
+                        resultCard.hidden = false;
+                        resultCard.classList.add("animate-in");
+
+                        resultCard.scrollIntoView({ behavior: "smooth", block: "center" });
+
+                    } catch (err) {
+                        loader.hidden = true;
+                        showError("Impossible de contacter le serveur.");
+                    }
+                }, "image/png");
+            });
+
+            function showError(msg) {
+                errorText.textContent = msg;
+                errorCard.hidden = false;
+                analyzeBtn.disabled = false;
+            }
+
+            // ── Reset buttons ──
+            resetBtn.addEventListener("click", fullReset);
+            errorResetBtn.addEventListener("click", fullReset);
+
+            function fullReset() {
+                resetUpload();
+                resultCard.hidden = true;
+                errorCard.hidden = true;
+                resultCard.classList.remove("animate-in");
+            }
+        })();
+    </script>
+    <!-- Prism.js syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+</body>
+
+</html>
