@@ -358,11 +358,18 @@ img {
     color: var(--text);
 }
 
-.mode-pill.active {
-    border-color: var(--accent);
-    background: rgba(102, 187, 106, 0.08);
-    color: var(--accent-dark);
-    box-shadow: 0 0 0 3px var(--accent-glow);
+.mode-pill--or.active {
+    border-color: #EF4444;
+    background: rgba(239, 68, 68, 0.08);
+    color: #991B1B;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+}
+
+.mode-pill--argent.active {
+    border-color: #3B82F6;
+    background: rgba(59, 130, 246, 0.08);
+    color: #1E40AF;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 /* Amélioration de la sélection sur mobile (Cropper) */
@@ -544,12 +551,82 @@ img {
     background: var(--bg-subtle);
 }
 
-.code-container {
+.code-accordions {
     max-width: 800px;
     margin: 2rem auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.code-accordion {
+    background: #fff;
+    border: 1px solid var(--border);
     border-radius: var(--radius);
     overflow: hidden;
-    box-shadow: var(--shadow-lg);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.2s ease;
+}
+
+.code-accordion:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.code-accordion summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    background: #FAFAFA;
+    list-style: none;
+}
+
+.code-accordion summary::-webkit-details-marker {
+    display: none;
+}
+
+.summary-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.code__badge {
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.code__badge--or {
+    background: rgba(239, 68, 68, 0.1);
+    color: #DC2626;
+}
+
+.code__badge--argent {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563EB;
+}
+
+.code__filename {
+    font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.code-accordion svg.chevron {
+    color: var(--text-muted);
+    transition: transform 0.3s ease;
+}
+
+.code-accordion[open] svg.chevron {
+    transform: rotate(180deg);
+}
+
+.code-container {
+    border-top: 1px solid var(--border);
 }
 
 .code-header {
