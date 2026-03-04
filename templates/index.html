@@ -23,7 +23,11 @@
     <header class="hero">
         <div class="hero__badge">🔬 Projet Chimie</div>
         <h1 class="hero__title">Détection d'Anticorps Bovins<br><span>dans le Lait de Brebis</span></h1>
-        <p class="hero__subtitle">Quantification par test à flux latéral &amp; analyse d'image</p>
+        <p class="hero__subtitle">
+            Quantification par test à flux latéral &amp; analyse d'image<br>
+            <span style="font-size: 0.85em; opacity: 0.85; display: inline-block; margin-top: 0.5rem;">Projet réalisé
+                par le Groupe Chimie 1 – BA2 École polytechnique de Bruxelles (2025-2026)</span>
+        </p>
         <div class="hero__scroll-hint">
             <span>Découvrir le protocole</span>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -490,7 +494,7 @@ if __name__ == "__main__":
 
     <!-- ════════════════ FOOTER ════════════════ -->
     <footer class="footer">
-        <p>Projet de Chimie — Détection d'anticorps bovins &bull; <span id="year"></span></p>
+        <p>Groupe Chimie 1, BA2 École polytechnique de Bruxelles &bull; Année académique 2025-2026</p>
     </footer>
 
     <!-- ════════════════ JAVASCRIPT ════════════════ -->
@@ -520,9 +524,6 @@ if __name__ == "__main__":
 
             let cropper = null;
             let currentMode = "or";
-
-            // Année dynamique
-            document.getElementById("year").textContent = new Date().getFullYear();
 
             // ── Intersection Observer (animation au scroll) ──
             const observer = new IntersectionObserver(entries => {
