@@ -146,7 +146,11 @@
                 <span class="result-card__unit" id="resultUnit">µg/mL</span>
             </div>
             <p class="result-card__detail" id="resultDetail"></p>
-            <button class="btn btn--ghost" id="resetBtn" type="button">Nouvelle analyse</button>
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 1.25rem;">
+                <button class="btn btn--primary" id="reselectBtn" style="margin-top: 0" type="button">Ajuster la zone
+                    test</button>
+                <button class="btn btn--ghost" id="resetBtn" style="margin-top: 0" type="button">Nouvelle image</button>
+            </div>
         </div>
 
         <!-- Erreur -->
@@ -297,6 +301,7 @@ if __name__ == "__main__":
             const errorCard = document.getElementById("errorCard");
             const errorText = document.getElementById("errorText");
             const errorResetBtn = document.getElementById("errorResetBtn");
+            const reselectBtn = document.getElementById("reselectBtn");
             const modePills = document.querySelectorAll(".mode-pill");
 
             let cropper = null;
@@ -432,6 +437,12 @@ if __name__ == "__main__":
             }
 
             // ── Reset buttons ──
+            reselectBtn.addEventListener("click", () => {
+                resultCard.hidden = true;
+                resultCard.classList.remove("animate-in");
+                analyzeBtn.disabled = false;
+                cropperWrapper.scrollIntoView({ behavior: "smooth", block: "center" });
+            });
             resetBtn.addEventListener("click", fullReset);
             errorResetBtn.addEventListener("click", fullReset);
 
