@@ -345,8 +345,8 @@ if __name__ == "__main__":
                     // Initialiser Cropper.js
                     cropper = new Cropper(cropperImg, {
                         viewMode: 1,
-                        dragMode: 'move',
-                        autoCropArea: 0.5,
+                        dragMode: 'crop', // Permet de dessiner une nouvelle zone facilement
+                        autoCropArea: 0.15, // Zone initiale plus petite
                         responsive: true,
                         restore: false,
                         guides: true,
