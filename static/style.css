@@ -317,6 +317,54 @@ img {
     margin-top: 0.75rem;
 }
 
+/* Mode selector (or / argent) */
+.mode-selector {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.mode-selector__label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    margin-bottom: 0.5rem;
+}
+
+.mode-selector__pills {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.mode-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.6rem 1.1rem;
+    border: 2px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg);
+    font-family: var(--font);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--transition);
+}
+
+.mode-pill:hover {
+    border-color: var(--accent-light);
+    color: var(--text);
+}
+
+.mode-pill.active {
+    border-color: var(--accent);
+    background: rgba(102, 187, 106, 0.08);
+    color: var(--accent-dark);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
 /* ═══════════════════════════════════════════════
    BUTTONS
    ═══════════════════════════════════════════════ */

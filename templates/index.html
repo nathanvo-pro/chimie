@@ -104,6 +104,19 @@
             <button class="btn btn--ghost" id="removeBtn" type="button">Changer d'image</button>
         </div>
 
+        <!-- Sélecteur de mode -->
+        <div class="mode-selector" id="modeSelector">
+            <p class="mode-selector__label">Type de nanoparticules utilisées :</p>
+            <div class="mode-selector__pills">
+                <button class="mode-pill active" data-mode="or" type="button">
+                    🟡 Nanoparticules d'or
+                </button>
+                <button class="mode-pill" data-mode="argent" type="button">
+                    🟤 Nanotriangles d'argent
+                </button>
+            </div>
+        </div>
+
         <!-- Bouton analyse -->
         <button class="btn btn--primary btn--large" id="analyzeBtn" disabled>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -284,8 +297,10 @@ if __name__ == "__main__":
             const errorCard = document.getElementById("errorCard");
             const errorText = document.getElementById("errorText");
             const errorResetBtn = document.getElementById("errorResetBtn");
+            const modePills = document.querySelectorAll(".mode-pill");
 
             let cropper = null;
+            let currentMode = "or";
 
             // Année dynamique
             document.getElementById("year").textContent = new Date().getFullYear();
@@ -357,6 +372,15 @@ if __name__ == "__main__":
                 analyzeBtn.disabled = true;
             }
 
+            // ── Mode selector ──
+            modePills.forEach(pill => {
+                pill.addEventListener("click", () => {
+                    modePills.forEach(p => p.classList.remove("active"));
+                    pill.classList.add("active");
+                    currentMode = pill.dataset.mode;
+                });
+            });
+
             // ── Analyze button ──
             analyzeBtn.addEventListener("click", async () => {
                 if (!cropper) return;
@@ -372,6 +396,7 @@ if __name__ == "__main__":
                 canvas.toBlob(async (blob) => {
                     const formData = new FormData();
                     formData.append("image", blob, "cropped.png");
+                    formData.append("mode", currentMode);
 
                     try {
                         const response = await fetch("/predict", { method: "POST", body: formData });
@@ -387,7 +412,7 @@ if __name__ == "__main__":
                         // Afficher le résultat
                         resultValue.textContent = data.concentration;
                         resultUnit.textContent = data.unit;
-                        resultDetail.textContent = `Intensité verte mesurée : ${data.intensity}`;
+                        resultDetail.textContent = `Intensité ${data.canal} mesurée : ${data.intensity}`;
                         resultCard.hidden = false;
                         resultCard.classList.add("animate-in");
 

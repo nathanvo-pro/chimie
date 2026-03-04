@@ -15,12 +15,12 @@ import numpy as np
 
 # ──────────────────────────────────────────────────────────────
 # CONSTANTES DE CALIBRATION
-# Formule : concentration = (intensité_verte - B) / A
-# A = pente de la droite de calibration
-# B = ordonnée à l'origine
+# Formule : concentration = (intensité - B) / A
 # ──────────────────────────────────────────────────────────────
-A: float = 8.12    # pente (à ajuster selon ta courbe)
-B: float = 152.33  # ordonnée à l'origine
+CALIB = {
+    "or":     {"A": 8.12,  "B": 152.33},   # nanoparticules d'or  (canal vert)
+    "argent": {"A": 8.81,  "B": 149.42},   # nanotriangles d'argent (canal jaune)
+}
 
 # ──────────────────────────────────────────────────────────────
 # CONFIGURATION FLASK
@@ -38,29 +38,28 @@ def allowed_file(filename: str) -> bool:
 # ──────────────────────────────────────────────────────────────
 # TRAITEMENT D'IMAGE
 # ──────────────────────────────────────────────────────────────
-def process_image(image_file) -> float:
+def process_image(image_file, mode: str = "or") -> float:
     """
     Analyse l'image (déjà rognée côté navigateur via Cropper.js)
-    et renvoie l'intensité moyenne du canal VERT.
+    et renvoie l'intensité moyenne selon le mode choisi.
 
-    Paramètres
-    ----------
-    image_file : file-like object
-        Fichier image (bytes) ou chemin.
-
-    Retourne
-    --------
-    float
-        Intensité moyenne du canal vert (0–255).
+    Modes
+    -----
+    - "or"     : canal VERT seul  →  arr[:,:,1]
+    - "argent" : canal JAUNE       →  (R + G) / 2
     """
-
-    # 1. Charger l'image en RGB depuis la mémoire
     img = Image.open(image_file).convert("RGB")
     arr = np.array(img)
 
-    # 2. Calcul de l'intensité moyenne du canal VERT
-    green_channel = arr[:, :, 1].astype(np.float32)
-    mean_intensity = float(np.mean(green_channel))
+    if mode == "argent":
+        # Intensité jaune = (Rouge + Vert) / 2
+        R = arr[:, :, 0].astype(np.float32)
+        G = arr[:, :, 1].astype(np.float32)
+        mean_intensity = float(np.mean((R + G) / 2))
+    else:
+        # Intensité verte
+        green = arr[:, :, 1].astype(np.float32)
+        mean_intensity = float(np.mean(green))
 
     return mean_intensity
 
@@ -68,23 +67,16 @@ def process_image(image_file) -> float:
 # ──────────────────────────────────────────────────────────────
 # CALIBRATION
 # ──────────────────────────────────────────────────────────────
-def calibrate(intensity: float) -> float:
+def calibrate(intensity: float, mode: str = "or") -> float:
     """
-    Convertit l'intensité verte en concentration d'anticorps
+    Convertit l'intensité en concentration d'anticorps
     via la formule :  concentration = (intensité - B) / A
-
-    Paramètres
-    ----------
-    intensity : float
-        Intensité verte moyenne renvoyée par process_image().
-
-    Retourne
-    --------
-    float
-        Concentration estimée en anticorps (µg/mL).
-        La valeur est bornée à 0 minimum (pas de concentration négative).
+    avec les constantes correspondant au mode choisi.
     """
-    concentration = (intensity - B) / A
+    c = CALIB[mode]
+    concentration = (intensity - c["B"]) / c["A"]
+    if concentration < 0:
+        concentration = 0
     return concentration
 
 
@@ -115,19 +107,26 @@ def predict():
     if not allowed_file(file.filename):
         return jsonify({"error": "Format de fichier non supporté."}), 400
 
+    # Lire le mode (or / argent)
+    mode = request.form.get("mode", "or")
+    if mode not in CALIB:
+        return jsonify({"error": "Mode invalide. Choisis 'or' ou 'argent'."}), 400
+
     # Traitement direct en mémoire (sans sauvegarde disque pour Vercel)
     try:
-        # Étape 1 : extraction de l'intensité
-        # On passe directement le flux de fichier (file.stream) à Pillow
-        intensity = process_image(file.stream)
+        # Étape 1 : extraction de l'intensité selon le mode
+        intensity = process_image(file.stream, mode)
 
         # Étape 2 : calibration → concentration
-        concentration = calibrate(intensity)
+        concentration = calibrate(intensity, mode)
 
+        canal = "jaune (R+G)/2" if mode == "argent" else "verte"
         return jsonify({
             "concentration": float(f"{concentration:.4g}"),
             "unit": "µg/mL",
             "intensity": round(intensity, 2),
+            "canal": canal,
+            "mode": mode,
         })
 
     except Exception as e:
