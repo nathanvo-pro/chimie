@@ -6,11 +6,11 @@
 /* ── Tokens ── */
 :root {
     --bg: #FFFFFF;
-    --bg-subtle: #F6FAF6;
-    --accent: #66BB6A;
-    --accent-light: #A5D6A7;
-    --accent-dark: #43A047;
-    --accent-glow: rgba(102, 187, 106, 0.25);
+    --bg-subtle: #F0F4FA;
+    --accent: #03224c;
+    --accent-light: #4a6fa5;
+    --accent-dark: #021535;
+    --accent-glow: rgba(3, 34, 76, 0.2);
     --text: #2D2D2D;
     --text-muted: #6B7280;
     --border: #E5E7EB;
